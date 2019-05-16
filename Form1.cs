@@ -31,6 +31,7 @@ namespace WindowsFormsApp1
             var fileContent = string.Empty;
             var fExt = string.Empty;
             var filePath = string.Empty;
+            var conversionType = string.Empty;
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -45,6 +46,7 @@ namespace WindowsFormsApp1
                     
                     //Get the path of specified file
                     filePath = openFileDialog.FileName;
+                    textBox1.Text = filePath;
                     //Read the contents of the file into a stream
                     var fileStream = openFileDialog.OpenFile();
 
@@ -58,28 +60,37 @@ namespace WindowsFormsApp1
             }
             //////////////////////////////
             var cId = comboBox1.Text;
+            conversionType = comboBox2.Text;
             debugOutput(cId);
             //RestClient rClient = new RestClient(cId, fileContent, fExt, "Account");
-            RestClient rClient = new RestClient(cId, fileContent, fExt, filePath, "Account");
+            RestClient rClient = new RestClient(cId, fileContent, fExt, filePath, conversionType, "api");
             //rClient.endPoint = "https://jsonplaceholder.typicode.com/todos";
             //rClient.endPoint = "https://jsonplaceholder.typicode.com/posts";
-            rClient.endPoint = "http://127.0.0.1/api/convert.php";
+            rClient.endPoint = "http://127.0.0.1/efs/api/convertjson.php";
             debugOutput("Rest Client Created");
-            
 
-            string strResponse = string.Empty;
-            strResponse = await rClient.makeFormRequestAsync();
-            debugOutput(strResponse);
+
+            //string strResponse = string.Empty;
+
+            //strResponse = await rClient.makeFormRequestAsync();
+            
+            byte[] strResponse = await rClient.makeFormJsonRequestAsync();
+            var str = System.Text.Encoding.Default.GetString(strResponse);
+            debugOutput(str);
+            str = str.Replace("\"", "");
+            debugOutput(str);
+            debugOutput("Rest Client Created2");
 
             //clientId = comboBox1.SelectedValue.ToString();
-            debugOutput(strResponse);
+            //debugOutput(strResponse);
 
             // Example #2: Write one string to a text file.
             string text = "A class is the most powerful data type in C#. Like a structure, " +
                            "a class defines the data and behavior of the data type. ";
             // WriteAllText creates a file, writes the specified string to the file,
             // and then closes the file.    You do NOT need to call Flush() or Close().
-            System.IO.File.WriteAllText(@"C:\Users\keith\source\repos\WindowsFormsApp1\WriteText.txt", text);
+            System.IO.File.WriteAllText(@"C:\Users\keith\source\repos\WindowsFormsApp1\WriteText.txt", str);
+            //System.IO.File.WriteAllText(filePath, str);
             //string fileName = String.Format(@"{0}\type1.txt", Application.StartupPath);
         }
 

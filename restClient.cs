@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace WindowsFormsApp1
 {
@@ -30,8 +31,9 @@ namespace WindowsFormsApp1
         public string fileExtension { get; set; }
         public string fileName { get; set; }
         public string conversionType { get; set; }
+        public string accessType { get; set; }
 
-        public RestClient(string cId, string fContent, string fExt, string fName, string cType)
+        public RestClient(string cId, string fContent, string fExt, string fName, string cType, string aType)
         {
             endPoint = string.Empty;
             httpMethod = httpVerb.POST;
@@ -41,13 +43,35 @@ namespace WindowsFormsApp1
             fileExtension = fExt;
             fileName = fName;
             conversionType = cType;
+            accessType = aType;
         }
 
+        public async Task<byte[]> makeFormJsonRequestAsync()
+        {
+            using (HttpClient client = new HttpClient());
+            // Build the conversion options
+            var options = new
+            {
+                clientId = clientId,
+                fileContent = fileContent,
+                fileExtension = fileExtension,
+                fileName = fileName,
+                conversionType = conversionType,
+                accessType = accessType
+            };
+            // Serialize our concrete class into a JSON String
+            var stringPayload = JsonConvert.SerializeObject(options);
+            var content = new StringContent(stringPayload, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(endPoint, content);
+            var result = await response.Content.ReadAsByteArrayAsync();
+            return result;
+        }
         public async Task<string> makeFormRequestAsync()
         {
             // using (HttpClient client = new HttpClient());
             //var client = new System.Net.Http.HttpClient();
             //string clientId = comboBox1.SelectedValue.ToString();
+            string conversionType = "huh";
             HttpContent content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("clientId", clientId),
@@ -58,10 +82,11 @@ namespace WindowsFormsApp1
             });
 
             content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
-            var response = await client.PostAsync("http://127.0.0.1/api/convert.php", content);
+            //var response = await client.PostAsync("http://192.168.1.3/api/convert.php", content);
+            var response = await client.PostAsync("http://127.0.0.1/efs/api/convert.php", content);
             //if (response.IsSuccessStatusCode)
             //{
-                string respContent = await response.Content.ReadAsStringAsync();
+            string respContent = await response.Content.ReadAsStringAsync();
             //return respContent;
             return await Task.FromResult(respContent);
             //}

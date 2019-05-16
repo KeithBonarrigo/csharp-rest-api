@@ -28,28 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.txtClientID = new System.Windows.Forms.TextBox();
             this.txtResponse = new System.Windows.Forms.TextBox();
             this.submitButton = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
-            // 
-            // txtClientID
-            // 
-            this.txtClientID.Location = new System.Drawing.Point(155, 65);
-            this.txtClientID.Margin = new System.Windows.Forms.Padding(4);
-            this.txtClientID.Name = "txtClientID";
-            this.txtClientID.Size = new System.Drawing.Size(132, 22);
-            this.txtClientID.TabIndex = 0;
-            this.txtClientID.Text = "Client ID";
             // 
             // txtResponse
             // 
             this.txtResponse.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtResponse.Location = new System.Drawing.Point(155, 162);
+            this.txtResponse.Location = new System.Drawing.Point(155, 194);
             this.txtResponse.Margin = new System.Windows.Forms.Padding(4);
             this.txtResponse.Multiline = true;
             this.txtResponse.Name = "txtResponse";
@@ -58,7 +49,7 @@
             // 
             // submitButton
             // 
-            this.submitButton.Location = new System.Drawing.Point(296, 65);
+            this.submitButton.Location = new System.Drawing.Point(812, 62);
             this.submitButton.Margin = new System.Windows.Forms.Padding(4);
             this.submitButton.Name = "submitButton";
             this.submitButton.Size = new System.Drawing.Size(100, 28);
@@ -72,8 +63,9 @@
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
             "Y7501",
-            "Y1234"});
-            this.comboBox1.Location = new System.Drawing.Point(169, 119);
+            "Y2532",
+            "Y9650"});
+            this.comboBox1.Location = new System.Drawing.Point(175, 66);
             this.comboBox1.Margin = new System.Windows.Forms.Padding(4);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(160, 24);
@@ -83,23 +75,30 @@
             // 
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Items.AddRange(new object[] {
-            "Collection",
-            "Remit"});
-            this.comboBox2.Location = new System.Drawing.Point(413, 119);
+            "New Account File",
+            "Payment"});
+            this.comboBox2.Location = new System.Drawing.Point(353, 66);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(121, 24);
             this.comboBox2.TabIndex = 4;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(155, 133);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(757, 22);
+            this.textBox1.TabIndex = 5;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.submitButton);
             this.Controls.Add(this.txtResponse);
-            this.Controls.Add(this.txtClientID);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -110,12 +109,11 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox txtClientID;
         private System.Windows.Forms.TextBox txtResponse;
         private System.Windows.Forms.Button submitButton;
         public System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 
