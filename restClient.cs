@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -19,7 +18,6 @@ namespace WindowsFormsApp1
         PUT,
         DELETE
     }
-
 
     class RestClient
     {
@@ -95,11 +93,6 @@ namespace WindowsFormsApp1
                 string nope = "nope";
                 return nope;
             }*/
-        }
-
-        public string getResult()
-        {
-            return "123";
         }
             public string makeRequest()
         {

@@ -37,6 +37,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.errorDisplay = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // txtResponse
@@ -58,7 +59,7 @@
             this.submitButton.Name = "submitButton";
             this.submitButton.Size = new System.Drawing.Size(100, 28);
             this.submitButton.TabIndex = 2;
-            this.submitButton.Text = "Convert File";
+            this.submitButton.Text = "Upload File";
             this.submitButton.UseVisualStyleBackColor = true;
             this.submitButton.Click += new System.EventHandler(this.submitButton_ClickAsync);
             // 
@@ -139,11 +140,23 @@
             this.label4.Size = new System.Drawing.Size(0, 17);
             this.label4.TabIndex = 9;
             // 
+            // errorDisplay
+            // 
+            this.errorDisplay.AutoSize = true;
+            this.errorDisplay.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.errorDisplay.ForeColor = System.Drawing.Color.Crimson;
+            this.errorDisplay.Location = new System.Drawing.Point(175, 71);
+            this.errorDisplay.Name = "errorDisplay";
+            this.errorDisplay.Size = new System.Drawing.Size(14, 17);
+            this.errorDisplay.TabIndex = 10;
+            this.errorDisplay.Text = "-";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.Controls.Add(this.errorDisplay);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -172,6 +185,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label errorDisplay;
     }
 }
 
