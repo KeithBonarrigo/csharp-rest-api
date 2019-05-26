@@ -38,7 +38,7 @@ namespace WindowsFormsApp1
                 errorDisplay.Text = "You need to select both the ClientID and Action to Take";
             }
             else
-            {
+            { //we should have the client ID and the action selected at this point
                 #region buttonClick
                 //////////////////////////////
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -49,59 +49,45 @@ namespace WindowsFormsApp1
                     openFileDialog.RestoreDirectory = true;
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        //Get the path of specified file
-                        fExt = Path.GetExtension(openFileDialog.FileName);
-                        filePath = openFileDialog.FileName;
-                        filenameWithoutPath = Path.GetFileName(filePath);
-                        textBox1.Text = filePath;
-
-                        //Read the contents of the file into a stream
-                        var fileStream = openFileDialog.OpenFile();
-                        using (StreamReader reader = new StreamReader(fileStream))
+                    { //we've selected the file
+                        try
                         {
-                            fileContent = reader.ReadToEnd();
+                            fExt = Path.GetExtension(openFileDialog.FileName); //Get the path of specified file
+                            filePath = openFileDialog.FileName;
+                            filenameWithoutPath = Path.GetFileName(filePath);
+                            textBox1.Text = filePath;
+
+                            //Read the contents of the file into a stream
+                            var fileStream = openFileDialog.OpenFile();
+                            using (StreamReader reader = new StreamReader(fileStream))
+                            {
+                                fileContent = reader.ReadToEnd();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.Write(ex.Message, ToString() + Environment.NewLine);
                         }
                     }
                 }
                 //////////////////////////////
                 var cId = comboBox1.Text;
                 conversionType = comboBox2.Text;
-                debugOutput(cId);
                 RestClient rClient = new RestClient(cId, fileContent, fExt, filePath, conversionType, "api");
-                rClient.endPoint = "http://127.0.0.1/efs/api/convertjson.php";
+                rClient.endPoint = "http://192.168.1.3/api/convertjson.php";
                 debugOutput("Rest Client Created");
 
                 byte[] strResponse = await rClient.makeFormJsonRequestAsync();
-                //byte[] bytes = ASCIIEncoding.GetBytes(strResponse);
                 var str = System.Text.Encoding.ASCII.GetString(strResponse);
-
-                /*
-                // Convert Unicode to Bytes
-
-                byte[] uni = Encoding.Unicode.GetBytes(str);
-
-                // Convert to ASCII
-
-                string Ascii = Encoding.ASCII.GetString(uni);
-                //string uni = Encoding.Unicode.GetBytes(strResponse);
-
-                // Convert to ASCII
-                */
-
-                //var str = System.Text.Encoding.Default.GetString(strResponse);
 
                 str = str.Replace("\"", ""); //cleanup
                 str = str.Replace("\\", ""); //cleanup
-                //str = str.Replace("u2019", "'"); //cleanup
-
 
                 var convertedName = "converted_" + filenameWithoutPath;
                 string path = Directory.GetCurrentDirectory();
                 string[] paths = { @path, convertedName };
                 string fullPath = Path.Combine(paths);
                 debugOutput(str);
-                //debugOutput(fullPath);
 
                 System.IO.File.WriteAllText(@fullPath, str);
                 label4.Text = "Export file created at:\\r\\n" + fullPath;
@@ -110,6 +96,7 @@ namespace WindowsFormsApp1
             }
         }
 
+        #region debugOutput
         private void debugOutput(string strDebugText)
         {
             try
@@ -124,5 +111,6 @@ namespace WindowsFormsApp1
                 System.Diagnostics.Debug.Write(ex.Message, ToString() + Environment.NewLine);
             }
         }
+        #endregion
     }
 }
