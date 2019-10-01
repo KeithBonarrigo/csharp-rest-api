@@ -25,19 +25,23 @@ namespace WindowsFormsApp1
         public httpVerb httpMethod { get; set; }
         public string clientId { get; set; }
         public string fileContent { get; set; }
+        public string interestContent { get; set; }
         public string fileExtension { get; set; }
         public string fileName { get; set; }
+        public string interestFileName { get; set; }
         public string conversionType { get; set; }
         public string accessType { get; set; }
 
-        public RestClient(string cId, string fContent, string fExt, string fName, string cType, string aType)
+        public RestClient(string cId, string fContent, string fExt, string fName, string cType, string aType, string iContent, string iName)
         {
             endPoint = string.Empty;
             httpMethod = httpVerb.POST;
             clientId = cId;
             fileContent = fContent;
+            interestContent = iContent;
             fileExtension = fExt;
             fileName = fName;
+            interestFileName = iName;
             conversionType = cType;
             accessType = aType;
         }
@@ -51,8 +55,10 @@ namespace WindowsFormsApp1
                 fileContent = fileContent,
                 fileExtension = fileExtension,
                 fileName = fileName,
+                interestFileName = interestFileName,
                 conversionType = conversionType,
-                accessType = accessType
+                accessType = accessType,
+                interestContent = interestContent
             };
             // Serialize our concrete class into a JSON String
             var stringPayload = JsonConvert.SerializeObject(options);

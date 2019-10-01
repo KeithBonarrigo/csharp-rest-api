@@ -38,6 +38,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.errorDisplay = new System.Windows.Forms.Label();
+            this.interestUploadButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtResponse
@@ -59,7 +60,7 @@
             this.submitButton.Name = "submitButton";
             this.submitButton.Size = new System.Drawing.Size(100, 28);
             this.submitButton.TabIndex = 2;
-            this.submitButton.Text = "Upload File";
+            this.submitButton.Text = "Convert File";
             this.submitButton.UseVisualStyleBackColor = true;
             this.submitButton.Click += new System.EventHandler(this.submitButton_ClickAsync);
             // 
@@ -67,25 +68,26 @@
             // 
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
-            "Y7501",
             "Y2532",
-            "Y9650",
-            "EBS15",
-            "Y9155",
-            "Y6051",
-            "Y9083",
             "Y3210",
-            "Y9658",
-            "Y3401",
-            "Y9275",
-            "Y3432",
             "Y3373",
-            "Y9234"});
+            "Y3401",
+            "Y3432",
+            "Y6051",
+            "Y7501",
+            "Y9083",
+            "Y9155",
+            "Y9234",
+            "Y9275",
+            "Y9650",
+            "Y9658",
+            "EBS15"});
             this.comboBox1.Location = new System.Drawing.Point(175, 39);
             this.comboBox1.Margin = new System.Windows.Forms.Padding(4);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(160, 24);
             this.comboBox1.TabIndex = 3;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
             // 
             // comboBox2
             // 
@@ -151,11 +153,22 @@
             this.errorDisplay.TabIndex = 10;
             this.errorDisplay.Text = "-";
             // 
+            // interestUploadButton
+            // 
+            this.interestUploadButton.Location = new System.Drawing.Point(511, 39);
+            this.interestUploadButton.Name = "interestUploadButton";
+            this.interestUploadButton.Size = new System.Drawing.Size(161, 28);
+            this.interestUploadButton.TabIndex = 11;
+            this.interestUploadButton.Text = "Interest File (optional)";
+            this.interestUploadButton.UseVisualStyleBackColor = true;
+            this.interestUploadButton.Click += new System.EventHandler(this.InterestUploadButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.Controls.Add(this.interestUploadButton);
             this.Controls.Add(this.errorDisplay);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -168,7 +181,7 @@
             this.Controls.Add(this.txtResponse);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "EFS API Conversion Tool";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -186,6 +199,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label errorDisplay;
+        private System.Windows.Forms.Button interestUploadButton;
     }
 }
 
