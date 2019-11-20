@@ -15,6 +15,7 @@ namespace WindowsFormsApp1
     {
         public string interestContent;
         public string interestFileName;
+        public string fullPath;
 
         public Form1()
         {
@@ -23,7 +24,8 @@ namespace WindowsFormsApp1
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            button1.Visible = false;
+            clearWindowButton.Visible = false;
         }
 
         private async void submitButton_ClickAsync(object sender, EventArgs e)
@@ -71,6 +73,8 @@ namespace WindowsFormsApp1
                             {
                                 fileContent = reader.ReadToEnd();
                             }
+                            if (conversionType != "Payment") { button1.Visible = true; }
+                            clearWindowButton.Visible = true;
                         }
                         catch (Exception ex)
                         {
@@ -81,14 +85,10 @@ namespace WindowsFormsApp1
                 //////////////////////////////
                 var cId = comboBox1.Text;
                 conversionType = comboBox2.Text;
-                /*interestFileName = textBox1.Text;
-                debugOutput("interest Content");
-                debugOutput(interestContent);
-                debugOutput("interest FileName");
-                debugOutput(interestFileName); */
+                interestContent = txtResponse.Text;
                 RestClient rClient = new RestClient(cId, fileContent, fExt, filePath, conversionType, "api", interestContent, interestFileName);
-                //rClient.endPoint = "http://192.168.1.3/api/convertjson.php";
-                rClient.endPoint = "http://127.0.0.1/efs/api/convertjson.php";
+                String URL_LOC = Globals.URL_LOCATION;
+                rClient.endPoint = @URL_LOC + "/api/convertjson.php";
                 debugOutput("Rest Client Created");
 
                 byte[] strResponse = await rClient.makeFormJsonRequestAsync();
@@ -96,15 +96,26 @@ namespace WindowsFormsApp1
 
                 str = str.Replace("\"", ""); //cleanup
                 str = str.Replace("\\", ""); //cleanup
+                str = str.Replace("#r#n", Environment.NewLine);
 
-                var convertedName = "converted_" + filenameWithoutPath;
+                var convertedName = "";
+                ///////////////
+                if (conversionType == "Payment")
+                {
+                    convertedName = "GuarPmt_EFS_" + DateTime.Today.ToString("MMddyyyy") + ".txt";
+                }
+                else
+                {
+                    convertedName = "converted_" + filenameWithoutPath;
+                }
+                ///////////////
                 string path = Directory.GetCurrentDirectory();
                 string[] paths = { @path, convertedName };
                 string fullPath = Path.Combine(paths);
                 debugOutput(str);
 
                 System.IO.File.WriteAllText(@fullPath, str);
-                label4.Text = "Export file created at:\\r\\n" + fullPath;
+                label4.Text = fullPath;
                 //////////////////////////////
                 #endregion
             }
@@ -134,66 +145,35 @@ namespace WindowsFormsApp1
             var interestFilePath = string.Empty;
             var interestFileName = string.Empty;
             var interestFilenameWithoutPath = string.Empty;
-            
-            #region interestButtonClick
-            //////////////////////////////
-            using (OpenFileDialog openInterestFileDialog = new OpenFileDialog())
-            {
-                openInterestFileDialog.InitialDirectory = "c:\\";
-                openInterestFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-                openInterestFileDialog.FilterIndex = 2;
-                openInterestFileDialog.RestoreDirectory = true;
-
-                if (openInterestFileDialog.ShowDialog() == DialogResult.OK)
-                { //we've selected the file
-                    try
-                    {
-                        fExt = Path.GetExtension(openInterestFileDialog.FileName); //Get the path of specified file
-                        interestFilePath = openInterestFileDialog.FileName;
-                        interestFilenameWithoutPath = Path.GetFileName(interestFilePath);
-                        label1.Text = "Interest File to Upload";
-                        textBox1.Text = interestFilePath;
-
-                        //Read the contents of the file into a stream
-                        var fileStream = openInterestFileDialog.OpenFile();
-                        using (StreamReader reader = new StreamReader(fileStream))
-                        {
-                            interestFileContent = reader.ReadToEnd();
-                            interestContent = interestFileContent;
-                            interestFileName = interestFilePath;
-                        }
-                        //debugOutput(interestFileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.Write(ex.Message, ToString() + Environment.NewLine);
-                    }
-                }
-            }
-            //////////////////////////////
-            /*
-            byte[] strResponse = await rClient.makeFormJsonRequestAsync();
-            var str = System.Text.Encoding.ASCII.GetString(strResponse);
-
-            str = str.Replace("\"", ""); //cleanup
-            str = str.Replace("\\", ""); //cleanup
-
-            var convertedName = "converted_" + filenameWithoutPath;
-            string path = Directory.GetCurrentDirectory();
-            string[] paths = { @path, convertedName };
-            string fullPath = Path.Combine(paths);
-            debugOutput(str);
-
-            System.IO.File.WriteAllText(@fullPath, str); */
-            //label4.Text = "Interest File Uploaded";
-            //////////////////////////////
-            #endregion
-
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            string strPath = label4.Text;
+            //function call to get the filename
+            var filename = Path.GetFileName(strPath);
+            var destPath = string.Empty;
+            String URL_LOC = Globals.URL_LOCATION + "/FACS_sim_Desktop.php?clientId=" + comboBox1.Text + "&target_file=" + filename + "&mode=" + Globals.MODE;
+            destPath = URL_LOC;
+            System.Diagnostics.Process.Start(destPath);
+        }
+
+        private void ClearWindowButton_Click(object sender, EventArgs e)
+        {
+            txtResponse.Text = ""; //clears the output window
+        }
     }
+}
+
+public static class Globals
+{
+    public static String MODE = "dev";
+    public static String URL_LOCATION = "http://127.0.0.1/efs"; // dev
+    //public static String MODE = "prod";
+    //public static String URL_LOCATION = "http://192.168.1.3"; // prod
 }

@@ -39,6 +39,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.errorDisplay = new System.Windows.Forms.Label();
             this.interestUploadButton = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.clearWindowButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtResponse
@@ -55,7 +57,7 @@
             // 
             // submitButton
             // 
-            this.submitButton.Location = new System.Drawing.Point(812, 39);
+            this.submitButton.Location = new System.Drawing.Point(768, 39);
             this.submitButton.Margin = new System.Windows.Forms.Padding(4);
             this.submitButton.Name = "submitButton";
             this.submitButton.Size = new System.Drawing.Size(100, 28);
@@ -163,11 +165,33 @@
             this.interestUploadButton.UseVisualStyleBackColor = true;
             this.interestUploadButton.Click += new System.EventHandler(this.InterestUploadButton_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(875, 39);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(148, 27);
+            this.button1.TabIndex = 12;
+            this.button1.Text = "Preview Conversion";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // clearWindowButton
+            // 
+            this.clearWindowButton.Location = new System.Drawing.Point(768, 75);
+            this.clearWindowButton.Name = "clearWindowButton";
+            this.clearWindowButton.Size = new System.Drawing.Size(260, 23);
+            this.clearWindowButton.TabIndex = 13;
+            this.clearWindowButton.Text = "Clear Window Text";
+            this.clearWindowButton.UseVisualStyleBackColor = true;
+            this.clearWindowButton.Click += new System.EventHandler(this.ClearWindowButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.Controls.Add(this.clearWindowButton);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.interestUploadButton);
             this.Controls.Add(this.errorDisplay);
             this.Controls.Add(this.label4);
@@ -200,6 +224,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label errorDisplay;
         private System.Windows.Forms.Button interestUploadButton;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button clearWindowButton;
     }
 }
 
