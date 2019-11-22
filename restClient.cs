@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace WindowsFormsApp1
 {
@@ -66,7 +67,7 @@ namespace WindowsFormsApp1
             var response = await client.PostAsync(endPoint, content);
             if (response.IsSuccessStatusCode)
             { //this was a successful request - run it
-                var result = await response.Content.ReadAsByteArrayAsync();
+              var result = await response.Content.ReadAsByteArrayAsync();
                 return result;
             }
             else
@@ -75,4 +76,11 @@ namespace WindowsFormsApp1
             }
         }
     }
+    #region conversion
+    public class conversion
+    {
+        public string accountData { get; set; }
+        public string noteData { get; set; }
+    }
+    #endregion
 }
