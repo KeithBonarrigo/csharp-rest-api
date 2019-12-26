@@ -27,6 +27,7 @@ namespace WindowsFormsApp1
         {
             button1.Visible = false;
             clearWindowButton.Visible = false;
+            interestUploadButton.Visible = false;
         }
         
         private void debugOutput(string strDebugText)
@@ -37,6 +38,21 @@ namespace WindowsFormsApp1
                 txtResponse.Text = txtResponse.Text + strDebugText + Environment.NewLine;
                 txtResponse.SelectionStart = txtResponse.TextLength;
                 txtResponse.ScrollToCaret();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.Write(ex.Message, ToString() + Environment.NewLine);
+            }
+        }
+
+        private void showConversionOutput(string strDebugText)
+        {
+            try
+            {
+                System.Diagnostics.Debug.Write(strDebugText + Environment.NewLine);
+                conversionDataOutput.Text = conversionDataOutput.Text + strDebugText + Environment.NewLine;
+                conversionDataOutput.SelectionStart = conversionDataOutput.TextLength;
+                conversionDataOutput.ScrollToCaret();
             }
             catch (Exception ex)
             {
@@ -59,6 +75,21 @@ namespace WindowsFormsApp1
         private void ClearWindowButton_Click(object sender, EventArgs e)
         {
             txtResponse.Text = ""; //clears the output window
+            conversionDataOutput.Text = ""; //clears data window
+            if (comboBox2.Text == "New Account File")
+            {
+                interestUploadButton.Visible = true;
+                textBox1.Text = "File to Convert";
+            }
+            else if(comboBox2.Text == "Payment File")
+            {
+                interestUploadButton.Visible = false;
+                textBox1.Text = "Payment File to Convert";
+            }
+            label4.Text = "";
+            button1.Visible = false;
+            interestUploadButton.Visible = false;
+            clearWindowButton.Visible = false;
         }
 
         private void InterestUploadButton_Click(object sender, EventArgs e)
@@ -85,6 +116,7 @@ namespace WindowsFormsApp1
             }
             else
             { //we should have the client ID and the action selected at this point
+                errorDisplay.Text = ""; //clear any potential error messages
                 //////////////////////////////
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
@@ -101,10 +133,11 @@ namespace WindowsFormsApp1
                             filePath = openFileDialog.FileName;
                             filenameWithoutPath = Path.GetFileName(filePath);
 
+                            /*
                             if (label1.Text == "Interest File to Upload")
                             {
                                 interestFileName = textBox1.Text;
-                            }
+                            }*/
 
                             textBox1.Text = filePath;
                             //Read the contents of the file into a stream
@@ -128,8 +161,9 @@ namespace WindowsFormsApp1
                 interestContent = txtResponse.Text;
                 RestClient rClient = new RestClient(cId, fileContent, fExt, filePath, conversionType, "api", interestContent, interestFileName);
                 String URL_LOC = Globals.URL_LOCATION;
-                rClient.endPoint = @URL_LOC + "/api/convertjson.php";
-                debugOutput("Rest Client Created");
+                rClient.endPoint = @URL_LOC + "/api/convertjsonAPI.php";
+                debugOutput("Rest API Client Created");
+                //debugOutput(rClient.endPoint);
                 /* working */
                 //var strResponse = await rClient.makeFormJsonRequestAsync();
                 //var str = System.Text.Encoding.ASCII.GetString(strResponse);
@@ -142,10 +176,11 @@ namespace WindowsFormsApp1
                 //var strResponse = await rClient.makeFormJsonRequestAsync();
                 var strResponse = await rClient.makeFormJsonRequestAsync();
                 var bytesAsString = Encoding.UTF8.GetString(strResponse);
+
                 var thisConversion = JsonConvert.DeserializeObject<conversion>(bytesAsString);
                 var aD = thisConversion.accountData;
                 var nD = thisConversion.noteData;
-
+                
                 /*
                 str = str.Replace("\"", ""); //cleanup
                 str = str.Replace("\\", ""); //cleanup
@@ -154,7 +189,7 @@ namespace WindowsFormsApp1
 
                 string convertedName = "";
                 string convertedNoteName = "";
-                string str = "";
+                
                 int recordFileCreatedAlready = 0; //just a flag to set for the output to show whether a regular recordfile has already been create in case a notes file exists
                 //string path = Directory.GetCurrentDirectory();
                 ///////////////
@@ -173,14 +208,17 @@ namespace WindowsFormsApp1
                         createFile(aD, convertedName, 1);
                         recordFileCreatedAlready = 1;
                     }
-                    if (nD.Length > 0)
-                    { //we have a notes file - so we need to create a separate file and let the user know
-                        debugOutput("---NOTE FILE---");
-                        convertedNoteName = "appConverted_NoteFile_" + filenameWithoutPath;
-                        nD = cleanTextRecord(nD);
-                        int showTopLine = 0;
-                        if (recordFileCreatedAlready == 1) { showTopLine = 0; } else { showTopLine = 1; }
-                        createFile(nD, convertedNoteName, showTopLine);
+                    if (nD != null)
+                    {
+                        if (nD.Length > 0)
+                        { //we have a notes file - so we need to create a separate file and let the user know
+                            debugOutput("---NOTE FILE---");
+                            convertedNoteName = "appConverted_NoteFile_" + filenameWithoutPath;
+                            nD = cleanTextRecord(nD);
+                            int showTopLine = 0;
+                            if (recordFileCreatedAlready == 1) { showTopLine = 0; } else { showTopLine = 1; }
+                            createFile(nD, convertedNoteName, showTopLine);
+                        }
                     }
                 }
                 ///////////////
@@ -215,7 +253,9 @@ namespace WindowsFormsApp1
             string fullPath = Path.Combine(paths);
             //debugOutput(contentToWrite);
             if (writeTopLine == 1) { debugOutput("---------------------------------------------"); }
-            debugOutput(fullPath + nameOfFile + " created ");
+            //debugOutput(fullPath + nameOfFile + " created ");
+            debugOutput(fullPath + " created ");
+            showConversionOutput(contentToWrite);
             System.IO.File.WriteAllText(@fullPath, contentToWrite);
             debugOutput("---------------------------------------------");
             label4.Text = fullPath;
@@ -359,14 +399,43 @@ namespace WindowsFormsApp1
             txtResponse.Text = ""; //clears the output window
         }*/
         #endregion
+        #region changeActions
+        private void TextBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TextBox2_TextChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(comboBox2.Text == "New Account File"){
+                interestUploadButton.Visible = true;
+                textBox1.Text = "File to Convert";
+            }
+            else if(comboBox2.Text == "Payment File")
+            {
+                interestUploadButton.Visible = false;
+                textBox1.Text = "Payment File to Convert";
+            }
+        }
+
+        private void TextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
     }
 }
 #region globals
 public static class Globals
 {
-    public static String MODE = "dev";
-    public static String URL_LOCATION = "http://127.0.0.1/efs"; // dev
-    //public static String MODE = "prod";
-    //public static String URL_LOCATION = "http://192.168.1.3"; // prod
+    ///public static String MODE = "dev";
+    //public static String URL_LOCATION = "http://127.0.0.1/efs"; // dev
+    public static String MODE = "prod";
+    public static String URL_LOCATION = "http://192.168.1.3"; // prod
 }
 #endregion
