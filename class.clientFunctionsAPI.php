@@ -1818,16 +1818,23 @@ function checkAge($thisAge, $listDate){
 /////////////////////////////////////////////////////////////////////////////
 	function testForInterestFile(){
 		if($this->accessType == "api"){
-			$interestFile = $this->interestFileName;
+			//$interestFile = $this->interestFileName;
+			$iData = explode(PHP_EOL, $this->interestFileData);
+			$this->processInterestData($iData);
 		}else{
 			$iName = basename($_FILES["uploadFile"]["name"][1]);
 			$interestFile = "/home/nobody/".$_POST['clientId']."/".$iName;
+			if(file_exists($interestFile)){
+				$thisInterestData = file($interestFile);
+				$this->processInterestData($thisInterestData);
+			}
 		}
+		/*
 		//$interestFile = "C:\\xampp\\htdocs\\efs\\EBS15\\".$iName;
 		if(file_exists($interestFile)){
 			$thisInterestData = file($interestFile);
 			$this->processInterestData($thisInterestData);
-		}
+		}*/
 		return $this->exportData;
 	}
 /////////////////////////////////////////////////////////////////////////////
@@ -1837,12 +1844,22 @@ function checkAge($thisAge, $listDate){
 /////////////////////////////////////////////////////////////////////////////
 	function processInterestData($thisInterestData){
 		$counter = 1;
-		foreach($thisInterestData as $k=>$v){
+
+		$myfile = fopen('input8.txt', "w+");
+		ob_start();
+		print_r($thisInterestData);
+		$stuff = ob_get_contents();
+		ob_end_clean();
+		fwrite($myfile, $stuff);
+		fclose($myfile);
+
+		foreach($thisInterestData as $k=>$v){ 
+
 			$interest = 0;
 			$thisLine = explode(";", $v);
 			$firstTwoChars = substr($v, 1, 2);
 			$lastSevenChars = substr($v, 3, 7);
-
+			
 			if( $firstTwoChars == "CB" && is_numeric($lastSevenChars) ){
 				$accountTest = $firstTwoChars.$lastSevenChars;
 				$accountNumber = str_replace('"', "", $thisLine[0]);
@@ -1858,6 +1875,8 @@ function checkAge($thisAge, $listDate){
 			}//end if
 			$counter++;
 		} //end for
+		
+		
 	}
 /////////////////////////////////////////////////////////////////////////////
 ////checks for valid line

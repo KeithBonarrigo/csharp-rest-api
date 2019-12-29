@@ -6,6 +6,9 @@ class Conversion extends clientFunctions{
 	public $conversionType; //this is a string that will tell us if it is a collection account or a payment file to bring down the amount owed
 	public $notes; //notes...just arbitrary strings
 	public $fileData; //this is the raw data from the upload file
+	
+	public $interestFileData; //this is the interest data sent via the API
+
 	public $recallIds = array(); //this is an array of client ids that we want to potentially check against to recall and put into another file
 	public $recalledIds; //this is an array of client ids that we want to potentially check against to recall and put into another file
 
@@ -23,7 +26,7 @@ class Conversion extends clientFunctions{
 /////////////////////////////////////////////////////////////////////////////
 ////builds conversion object
 /////////////////////////////////////////////////////////////////////////////
-	function __construct($data, $fileName, $interestFileName, $fileDest, $recallIds, $accessType="browser"){
+	function __construct($data, $fileName, $interestFileName, $fileDest, $recallIds, $accessType="browser", $interestFileData=""){
 		global $UploadClientId; //this is the client id passed via cache
 		global $conversion; //this is the type of conversion like "New Accout File" or "Payment File"
 		global $clientnotes; //notes passed in via cache
@@ -35,6 +38,10 @@ class Conversion extends clientFunctions{
 		$this->conversionType = $conversion;
 		$this->notes = $clientnotes;
 		$this->fileData = $data; //take the raw data from the file
+		
+		$this->interestFileData = $interestFileData;
+		//$this->interestData = $interestData; //this is the uploaded 
+
 		$this->fileName = $fileName; //take the raw data from the file
 		$this->interestFileName = $interestFileName; //take the raw data from the file
 		if(is_array($recallIds)){
@@ -48,13 +55,15 @@ class Conversion extends clientFunctions{
 		//$this->convertedData = ""; #NEW - placeholder for the converted filedata to send back via the API
 		$this->convertedData = array(); #NEW - placeholder for the converted filedata to send back via the API
 		$this->findConversion(); //get the conversion name we're going to use to convert the data for import
-		$myfile = fopen('start.txt', "w+");
+		
+		/*$myfile = fopen('start.txt', "w+");
 		ob_start();
 		print_r($this);
 		$stuff = ob_get_contents();
 		ob_end_clean();
 		fwrite($myfile, $stuff);
 		fclose($myfile);
+		*/
 	}
 /////////////////////////////////////////////////////////////////////////////
 //tests the current client id to see if we need to switch it to something else
@@ -141,7 +150,7 @@ function setFlags($clientid){
 								$this->exportData[$recordNumber] = $this->massageDataShared($this->exportData[$recordNumber]);
 							} //end if
 						} //end if
-					} //end for
+					} //end for 
 
 					$this->exportData = $this->testForInterestFile(); //we've processed the base data into an array - let's see if we have an interest file available. if so, update that info for the 980 file
 				break;
