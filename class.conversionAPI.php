@@ -6,7 +6,6 @@ class Conversion extends clientFunctions{
 	public $conversionType; //this is a string that will tell us if it is a collection account or a payment file to bring down the amount owed
 	public $notes; //notes...just arbitrary strings
 	public $fileData; //this is the raw data from the upload file
-	
 	public $interestFileData; //this is the interest data sent via the API
 
 	public $recallIds = array(); //this is an array of client ids that we want to potentially check against to recall and put into another file
@@ -16,6 +15,8 @@ class Conversion extends clientFunctions{
 	public $interestFileName; //this is the name passed from the data upload file
 
 	public $accessType; #NEW for api access
+	public $mode; //live or dev
+
 	public $noteFileName; //this is the name passed from the data upload file
 	public $fileDest; //this is the base path for the finished export file
 	public $exportData; //this is the data we'll create the FACS import file with
@@ -26,7 +27,7 @@ class Conversion extends clientFunctions{
 /////////////////////////////////////////////////////////////////////////////
 ////builds conversion object
 /////////////////////////////////////////////////////////////////////////////
-	function __construct($data, $fileName, $interestFileName, $fileDest, $recallIds, $accessType="browser", $interestFileData=""){
+	function __construct($data, $fileName, $interestFileName, $fileDest, $recallIds, $accessType="browser", $interestFileData="", $mode="live"){
 		global $UploadClientId; //this is the client id passed via cache
 		global $conversion; //this is the type of conversion like "New Accout File" or "Payment File"
 		global $clientnotes; //notes passed in via cache
@@ -34,13 +35,13 @@ class Conversion extends clientFunctions{
 		global $recallIds;
 
 		$this->accessType = $accessType; #New for api access
+		$this->mode = $mode;
+
 		$this->clientId = $UploadClientId;
 		$this->conversionType = $conversion;
 		$this->notes = $clientnotes;
 		$this->fileData = $data; //take the raw data from the file
-		
-		$this->interestFileData = $interestFileData;
-		//$this->interestData = $interestData; //this is the uploaded 
+		$this->interestFileData = $interestFileData; //this is the data from the uploaded interest file  
 
 		$this->fileName = $fileName; //take the raw data from the file
 		$this->interestFileName = $interestFileName; //take the raw data from the file
@@ -55,15 +56,6 @@ class Conversion extends clientFunctions{
 		//$this->convertedData = ""; #NEW - placeholder for the converted filedata to send back via the API
 		$this->convertedData = array(); #NEW - placeholder for the converted filedata to send back via the API
 		$this->findConversion(); //get the conversion name we're going to use to convert the data for import
-		
-		/*$myfile = fopen('start.txt', "w+");
-		ob_start();
-		print_r($this);
-		$stuff = ob_get_contents();
-		ob_end_clean();
-		fwrite($myfile, $stuff);
-		fclose($myfile);
-		*/
 	}
 /////////////////////////////////////////////////////////////////////////////
 //tests the current client id to see if we need to switch it to something else

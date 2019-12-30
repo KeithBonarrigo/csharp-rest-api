@@ -23,9 +23,7 @@ function processFacsPaymentFile(){
 			$this->readFacsPaymentFile($k, $v);
 		}
 	}
-	$this->massageFacsPaymentDataAPI();
 	$this->writeFacsPaymentFileAPI();
-		
 }
 /////////////////////////////////////////////////////////////////////////////
 //checks payment file for validity to process
@@ -166,9 +164,10 @@ function massageFacsPaymentDataAPI(){
 	$date = date("Ymd");
 	$paymentFileName = "/home/nobody/Y9650/GuarPmt_EFS_".$date.".txt";
 	$exportDataReplace = ""; //this is a string we will use to build the text for the export file
-	
-	foreach($this->convertedData['accountData'] as $k=>$v){
-		$this->addDecimalForPaymentFile($k, $this->convertedData['accountData'][$k]['AppliedPrincipal'], 'AppliedPrincipal');
+
+	//foreach($this->convertedData['accountData'] as $k=>$v){
+	foreach($this->exportData as $k=>$v){
+		/*$this->addDecimalForPaymentFile($k, $this->convertedData['accountData'][$k]['AppliedPrincipal'], 'AppliedPrincipal');
 		if($this->convertedData['accountData'][$k]['DueAgency'] > 0){ $this->addDecimalForPaymentFile($k, $this->convertedData['accountData'][$k]['DueAgency'], 'DueAgency'); }	
 		if($this->convertedData['accountData'][$k]['PaidAgency'] > 0){ $this->addDecimalForPaymentFile($k, $this->convertedData['accountData'][$k]['PaidAgency'], 'PaidAgency'); }	
 		if($this->convertedData['accountData'][$k]['Balance'] > 0){ $this->addDecimalForPaymentFile($k, $this->convertedData['accountData'][$k]['Balance'], 'Balance'); }	
@@ -177,7 +176,7 @@ function massageFacsPaymentDataAPI(){
 		$this->convertedData['accountData'][$k]['ReceivableGroupID']	=	$vals[0];
 		$this->convertedData['accountData'][$k]['BillingPeriodSequence']	=	$vals[1];
 		$this->convertedData['accountData'][$k]['ResponsibleParty']		=	trim($vals[2]);
-		$this->convertedData['accountData'][$k]['ClientDebtorNumber'] = $this->exportData[$k]['ReceivableGroupID'];
+		$this->convertedData['accountData'][$k]['ClientDebtorNumber'] = $this->exportData[$k]['ReceivableGroupID'];*/
 	}
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -191,6 +190,7 @@ function addDecimalForPaymentFile($keyNum, $numberToSplit, $fieldName){
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 function writeFacsPaymentFile(){
+
 	$accountsSkipped = 0; //this is a flag for accounts that don't have a principal
 	$accountsProcessed = 0; //this is a flag to track the records we have processed on the file
 	$dp = 0;
@@ -205,8 +205,8 @@ function writeFacsPaymentFile(){
 	$maxlines = count($this->exportData); 
 	$lastLine = 0;
 	$date = date("Ymd");
-	$paymentFileName = "/home/nobody/".$this->clientId."/GuarPmt_EFS_".$date.".txt";
-	//$paymentFileName = "C:\\xampp\\htdocs\\efs\\Y9650\\"."GuarPmt_EFS_New_".$date.".txt";
+	//$paymentFileName = "/home/nobody/".$this->clientId."/GuarPmt_EFS_".$date.".txt";
+	$paymentFileName = "C:\\xampp\\htdocs\\efs\\Y9650\\"."GuarPmt_EFS_New_".$date.".txt";
 
 	$exportDataReplace = ""; //this is a string we will use to build the text for the export file
 	$index = 0;
@@ -341,8 +341,12 @@ function writeFacsPaymentFileAPI(){
 	$maxlines = count($this->exportData); 
 	$lastLine = 0;
 	$date = date("Ymd");
-	$paymentFileName = "/home/nobody/".$this->clientId."/GuarPmt_EFS_".$date.".txt";
-	//$paymentFileName = "C:\\xampp\\htdocs\\efs\\Y9650\\"."GuarPmt_EFS_New_".$date.".txt";
+
+	if($this->mode == "dev"){ //where to write the file
+		$paymentFileName = "C:\\xampp\\htdocs\\efs\\Y9650\\"."GuarPmt_EFS_New_".$date.".txt";
+	}else{
+		$paymentFileName = "/home/nobody/".$this->clientId."/GuarPmt_EFS_".$date.".txt";
+	}
 
 	$exportDataReplace = ""; //this is a string we will use to build the text for the export file
 	$index = 0;
@@ -420,9 +424,13 @@ function writeFacsPaymentFileAPI(){
 				$accounts_processed	=	$index + $accountsNotListed+1; #index starts with zero
 				$accountsNotListed 	= 	$accountsSkipped + $dp;
 				$paymentContent .= "GPT|PMT|False|True|Evergreen Financial|";				
-				$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber'])."^".trim($this->exportData[$k]['BillingPeriodSequence'])."^".trim($this->exportData[$k]['ResponsibleParty']);
-				$paymentContent .= "|11|";
+				//$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber'])."^".trim($this->exportData[$k]['BillingPeriodSequence'])."^".trim($this->exportData[$k]['ResponsibleParty']);
 				$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber']);
+				$paymentContent .= "|11|";
+
+				$stripped = str_replace("_", "", $this->exportData[$k]['ClientDebtorNumber']);
+
+				$paymentContent .= trim(substr( $stripped, 0, strlen($stripped-1) ));
 				$paymentContent .= "|";
 				$paymentContent .= $fileDate;
 					
@@ -458,149 +466,7 @@ function writeFacsPaymentFileAPI(){
 	fwrite($myfile, $localContent);
 	fclose($myfile);
 
-	//$this->exportData = $paymentContent;
 	$this->convertedData['accountData'] = $paymentContent;
-	
-}
-///////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////
-function writeFacsPaymentFileAPI_2(){
-	/*
-	$accountsSkipped = 0; //this is a flag for accounts that don't have a principal
-	$accountsProcessed = 0; //this is a flag to track the records we have processed on the file
-	$dp = 0;
-	$dpTotal = 0; //flag to track total amount collected(?)
-	$totalAccountsNotListed = 0; //number of accounts not listed
-	$detailRecordNum = 0;
-	$paidAgencyPrinc = 0; //this is the amount the collection agency has collected
-	$totalPaidClient = 0;
-	$totalPaidAgency = 0;
-	$totalDueAgency = 0;
-	$totalDueClient = 0;
-	$totalPayments = 0;
-	$maxlines = count($this->exportData); 
-	$lastLine = 0;
-	$date = date("Ymd");
-	//$paymentFileName = "/home/nobody/".$this->clientId."/GuarPmt_EFS_".$date.".txt";
-	$paymentFileName = "C:\\xampp\\htdocs\\efs\\Y9650\\"."GuarPmt_EFS_New_".$date.".txt";
-
-	$exportDataReplace = ""; //this is a string we will use to build the text for the export file
-	$index = 0;
-	$num_skipped_records = 0;
-
-	$paymentContent = "";
-	
-	foreach($this->exportData as $k=>$v){
-			//echo $k;
-			/////////////////////////////////////////////
-			$index++;
-			$skip_record =	"N";
-			$dpFlag	= "N";
-			$num_header_lines =	1;
-			$num_trailer_lines = 1;
-			if ($this->exportData[$k]['AppliedPrincipal'] <.01)	{	
-				$skip_record = "Y"; $accountsSkipped++; 
-			}else{
-				$accountsProcessed++;
-			}
-	
-			if ($this->exportData[$k]['PaymentType'] == "DPzzdf ") {
-				$dpFlag	= "Y";
-				$skip_record="Y";
-				$dpTotal = $dpTotal + $this->exportData[$k]['AppliedPrincipal'];
-				$dp++;
-				$totalAccountsNotListed= $totalAccountsNotListed + $dpTotal;
-				$detailRecordNum++;
-			}else{							
-				$paidAgencyPrinc = $paidAgencyPrinc + $this->exportData[$k]['$AppliedPrincipal'];
-			}
-	
-			if ($this->exportData[$k]['SignFieldPaidAgency'] == "-") {
-				$totalPaidAgency = $totalPaidAgency - $this->exportData[$k]['PaidAgency'];
-			}else{
-				$totalPaidAgency = $totalPaidAgency + $this->exportData[$k]['PaidAgency'];
-			}
-	
-			if ($this->exportData[$k]['SignFieldPaidClient'] == "-") {
-				$totalPaidClient = $totalPaidClient - $this->exportData[$k]['PaidClient'];
-			}else{
-				$totalPaidClient = $totalPaidClient + $this->exportData[$k]['PaidClient'];
-			}
-	
-			if ($this->exportData[$k]['SignFieldDueAgency'] == "-")	{
-				$totalDueAgency = $totalDueAgency - $this->exportData[$k]['DueAgency'];
-			}else{
-				$totalDueAgency = $totalDueAgency + $this->exportData[$k]['DueAgency'];
-			}
-	
-			if ($this->exportData[$k]['SignFieldDueClient'] == "-")	{
-				$totalDueClient = $totalDueClient - $this->exportData[$k]['DueClient'];
-			}else{
-				$totalDueClient = $totalDueClient + $this->exportData[$k]['DueClient'];
-			}
-			
-			/////////////////////////////////////////////////////////////
-			$fileDate = date("Ymd");
-			$fileID	= $fileDate . ".1";
-			$batchNumber = substr(time(), 0, 6);
-			$batchSubDate =	$fileDate;
-			$depositDate = $fileDate;
-			
-			if ( $skip_record == "Y" || $this->exportData[$k]['PaymentType'] == "DP") {
-				//$lastLine = $index + $num_skipped_records + $num_header_lines + $num_trailer_lines;
-					##############################################################################
-					########## Footer******* #####################################################
-					##############################################################################
-					//print RESULTFILE ("GPT|PMT|TRUE|TRUE|Evergreen Financial|||||5"); #this is the footer specified by YVMH
-				//}
-			}elseif ($skip_record == "N") { 	
-				//$lastLine++;
-				$BD++;
-				$totalPayments 		= 	$totalPayments + $this->exportData[$k]['AppliedPrincipal'];
-				$accounts_processed	=	$index + $accountsNotListed+1; #index starts with zero
-				$accountsNotListed 	= 	$accountsSkipped + $dp;
-				$paymentContent .= "GPT|PMT|False|True|Evergreen Financial|";				
-				$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber'])."^".trim($this->exportData[$k]['BillingPeriodSequence'])."^".trim($this->exportData[$k]['ResponsibleParty']);
-				$paymentContent .= "|11|";
-				$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber']);
-				$paymentContent .= "|";
-				$paymentContent .= $fileDate;
-					
-					if($this->exportData[$k]['PaymentType'] == 'COR' || $this->exportData[$k]['PaymentType'] == 'NSF'){
-						$paymentContent .= "|6|";
-						$posNeg = "";
-						$autoVal = "AutoEFSA";
-					}else{
-						$paymentContent .= "|5|";
-						$posNeg = "-";
-						$autoVal = "AutoEFS";
-					}
-
-				$paymentContent .= $autoVal;
-				$paymentContent .= "|";
-				$applied = ltrim($this->exportData[$k]['AppliedPrincipal'], '0');
-				$due = ltrim($this->exportData[$k]['DueAgency'], '0'); 
-				if(!$due || $due < .01) $due = "0";
-				$paymentContent .= $posNeg.$applied."|";
-				$paymentContent .= trim($this->exportData[$k]['PaymentType']);
-				$paymentContent .= "|";
-				$paymentContent .= $due.'#r#n';
-				$totalBalance 		= 	$totalBalance + $this->exportData[$k]['Balance'];							
-			}
-			////////////////////////////////////////////////////////////
-	
-	}
-	*/
-	$paymentContent .= "GPT|PMT|TRUE|TRUE|Evergreen Financial|||||5";
-	/*
-	if ($index == $maxlines) { 
-		//echo "$paymentFileName Found the last account, writing trailer for massage_YVMH_payment\n\n"; #index starts with zero
-		$localContent = str_replace('#r#n', "\r\n", $paymentContent);
-		//$myfile = fopen($paymentFileName, "w") or die("Unable to open $paymentFileName");
-		//fwrite($myfile, $localContent);
-		//fclose($myfile);
-	}*/
-	$this->exportData = $paymentContent;
 	
 }
 ///////////////////////////////////////////////////////////////////////////////////
@@ -1829,12 +1695,6 @@ function checkAge($thisAge, $listDate){
 				$this->processInterestData($thisInterestData);
 			}
 		}
-		/*
-		//$interestFile = "C:\\xampp\\htdocs\\efs\\EBS15\\".$iName;
-		if(file_exists($interestFile)){
-			$thisInterestData = file($interestFile);
-			$this->processInterestData($thisInterestData);
-		}*/
 		return $this->exportData;
 	}
 /////////////////////////////////////////////////////////////////////////////
@@ -1845,13 +1705,14 @@ function checkAge($thisAge, $listDate){
 	function processInterestData($thisInterestData){
 		$counter = 1;
 
-		$myfile = fopen('input8.txt', "w+");
+		/*$myfile = fopen('input8.txt', "w+");
 		ob_start();
 		print_r($thisInterestData);
 		$stuff = ob_get_contents();
 		ob_end_clean();
 		fwrite($myfile, $stuff);
 		fclose($myfile);
+		*/
 
 		foreach($thisInterestData as $k=>$v){ 
 

@@ -7,6 +7,8 @@ header("Content-Type: application/json; charset=UTF-8");
 $inputJSON = file_get_contents('php://input');
 $input = json_decode($inputJSON, TRUE); //convert JSON into array
 
+$mode = "dev";
+
 $fileNameRaw = $input['fileName'];
 $fileNameEx = explode("\\", $fileNameRaw);
 $fileNameCount = count($fileNameEx);
@@ -29,11 +31,11 @@ $myfile = fopen($fileNameFull, "w+");
 fwrite($myfile, $input['fileContent']);
 fclose($myfile);
 
-if(strlen($input['interestContent']) > 0){
+/*if(strlen($input['interestContent']) > 0){
     $myInterestFile = fopen($interestFileNameFull, "w+");
     fwrite($myInterestFile, $input['interestContent']);
     fclose($myInterestFile); 
-}
+}*/
 
 $recallIds = null;
 
@@ -46,8 +48,19 @@ $conversion = $input['conversionType'];
 require_once('../includes/classes/class.clientFunctionsAPI.php'); //specific to individual client IDs
 require_once('../includes/classes/class.conversionAPI.php'); //shared throughout program
 
-$data = file($fileNameFull);
-$thisConversion = new Conversion($data, $fileName, $interestFileNameFull, $destinationfilepath, $recallIds, $input['accessType']); //run the data through the conversion process
+/*
+$myfile = fopen('input3.txt', "w+");
+ob_start();
+print_r($input);
+$stuff = ob_get_contents();
+ob_end_clean();
+fwrite($myfile, $stuff);
+fclose($myfile);
+*/
+
+$data = file($fileNameFull); 
+
+$thisConversion = new Conversion($data, $fileName, $interestFileNameFull, $destinationfilepath, $recallIds, $input['accessType'], $input['interestContent'], $mode); //run the data through the conversion process
 
 $myfile = fopen('conversionObject.txt', "w+");
 ob_start();
