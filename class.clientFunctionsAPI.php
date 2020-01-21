@@ -425,7 +425,8 @@ function writeFacsPaymentFileAPI(){
 				$accountsNotListed 	= 	$accountsSkipped + $dp;
 				$paymentContent .= "GPT|PMT|False|True|Evergreen Financial|";				
 				//$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber'])."^".trim($this->exportData[$k]['BillingPeriodSequence'])."^".trim($this->exportData[$k]['ResponsibleParty']);
-				$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber']);
+				//$paymentContent .= trim($this->exportData[$k]['ClientDebtorNumber']);
+				$paymentContent .= trim(str_replace("_", "^",$this->exportData[$k]['ClientDebtorNumber']));
 				$paymentContent .= "|11|";
 
 				$stripped = str_replace("_", "", $this->exportData[$k]['ClientDebtorNumber']);
@@ -446,9 +447,14 @@ function writeFacsPaymentFileAPI(){
 
 				$paymentContent .= $autoVal;
 				$paymentContent .= "|";
-				$applied = ltrim($this->exportData[$k]['AppliedPrincipal'], '0');
-				$due = ltrim($this->exportData[$k]['DueAgency'], '0'); 
-				if(!$due || $due < .01) $due = "0";
+
+				$appPrinTrimmed = ltrim($this->exportData[$k]['AppliedPrincipal'], '0');
+				$applied = number_format($appPrinTrimmed/100, 2, '.', '');
+
+				$dueTrimmed = ltrim($this->exportData[$k]['DueAgency'], '0');
+				$due =  number_format($dueTrimmed/100, 2, '.', '');
+				
+				if(!$due || $due < .01) $due = "0.00";
 				$paymentContent .= $posNeg.$applied."|";
 				$paymentContent .= trim($this->exportData[$k]['PaymentType']);
 				$paymentContent .= "|";
